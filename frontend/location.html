@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Location</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        #map {
+            width: 100%;
+            height: 80vh;
+            max-width: 800px;
+            margin: 20px;
+        }
+        #location-info {
+            margin: 10px;
+            font-size: 16px;
+        }
+        #error {
+            color: red;
+            margin: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="location-info">Fetching your location...</div>
+    <div id="error"></div>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        function showLocation() {
+            const locationInfo = document.getElementById('location-info');
+            const errorDiv = document.getElementById('error');
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        locationInfo.textContent = `Your location: Latitude ${lat.toFixed(4)}, Longitude ${lon.toFixed(4)}`;
+
+                        // Initialize the map
+                        const map = L.map('map').setView([lat, lon], 13);
+
+                        // Add OpenStreetMap tiles
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        }).addTo(map);
+
+                        // Add a marker at the user's location
+                        L.marker([lat, lon]).addTo(map)
+                            .bindPopup('You are here!')
+                            .openPopup();
+                    },
+                    (error) => {
+                        locationInfo.textContent = '';
+                        errorDiv.style.display = 'block';
+                        errorDiv.textContent = 'Unable to retrieve location. Please ensure location services are enabled.';
+                    }
+                );
+            } else {
+                locationInfo.textContent = '';
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Geolocation is not supported by this browser.';
+            }
+        }
+
+        // Call the function when the page loads
+        window.onload = showLocation;
+    </script>
+</body>
+</html>
