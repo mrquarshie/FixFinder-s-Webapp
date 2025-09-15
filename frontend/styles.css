@@ -114,6 +114,12 @@
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
         }
+
+        .logo{
+            border-radius: 50px;
+
+
+        }
         
         .feature-card {
             background-color: #f8f9fa;
