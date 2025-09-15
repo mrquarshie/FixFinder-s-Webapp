@@ -120,7 +120,7 @@
 
 
         }
-        
+       
         .feature-card {
             background-color: #f8f9fa;
             border-radius: 8px;
@@ -268,5 +268,12 @@
                 border: none;
             }
 
-           
+           .locator{
+                font-size: large;
+                
+            
+           }
         }
+
+
+
