@@ -83,6 +83,31 @@
             .suggestion-item {
                 padding: 10px 16px;
             }
+            footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+        
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .footer-bottom {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
         }
     </style>
 </head>
@@ -197,5 +222,29 @@
             }
         });
     </script>
+     <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>FIXFINDER</h3>
+                    <p>Connecting vehicle owners with trusted mechanics since 2025.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <p><a href="location.html" style="color: #db7734;">Find a Mechanic</a></p>
+                    <p><a href="tel:0595785158" style="color: #3498db;">Become a Mechanic</a></p>
+                    <p><a href="tel:0595785158" style="color: #3498db;">Support</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact fixfinder customer Service</h3>
+                    <p>help@fixfinder.com</p>
+                    <p>0595785158</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 FIXFINDER. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
