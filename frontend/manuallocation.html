@@ -4,17 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FixFinder locations</title>
+     <link rel="stylesheet" href="styles.css">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f4f4f9;
+            background-color:  #2c3e50;
             color: #333;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            
         }
         .search-container {
             position: relative;
@@ -83,36 +85,14 @@
             .suggestion-item {
                 padding: 10px 16px;
             }
-            footer {
-            background-color: #2c3e50;
-            color: white;
-            padding: 2rem 0;
-            text-align: center;
-        }
-        
-        .footer-content {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            gap: 2rem;
-        }
-        
-        .footer-section {
-            flex: 1;
-            min-width: 250px;
-        }
-        
-        .footer-bottom {
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        
         }
     </style>
 </head>
 <body>
-    <h1>FIXFINDER  search</h1>
+    <div>
+        <div><h1>FIXFINDER</h1></div>
+
+    </div>
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="Search for a location in Ghana...">
         <div id="suggestions"></div>
