@@ -85,6 +85,63 @@
             .suggestion-item {
                 padding: 10px 16px;
             }
+            .location{
+                color: white;
+            }
+        }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .dropdown-button:hover {
+            background-color: #45a049;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 4px;
+        }
+        .dropdown-content button {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+        .dropdown-content button:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown.open .dropdown-content {
+            display: block;
+        }
+        .info-box {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f0f8ff;
+            border-radius: 72px;
         }
     </style>
 </head>
@@ -96,6 +153,67 @@
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="Search for a location in Ghana...">
         <div id="suggestions"></div>
+    </div>
+ <div class="dropdown">
+        <button class="dropdown-button" onclick="toggleDropdown()">Where in Ghana are you</button>
+        <div>
+            <div><button class="dropdown-content" onclick="showInfo('info1')">Greater Accra</button></div>
+            <div><button class="dropdown-content" onclick="showInfo('info2')">Bono</button></div>
+            <div><button class="dropdown-content" onclick="showInfo('info3')">Ahafo</button></div>
+             <div><button class="dropdown-content" onclick="showInfo('info3')">Bono East</button></div>
+             <div><button class="dropdown-content" onclick="showInfo('info3')">Central</button></div>
+             <div><button class="dropdown-content" onclick="showInfo('info3')">Northern</button></div>
+             <div><button class="dropdown-content" onclick="showInfo('info3')">North East</button></div>
+             <div><button class="dropdown-content" onclick="showInfo('info3')">Oti</button></div>
+             <div><button class="dropdown-content" onclick="showInfo('info3')">Savannah</button></div>
+             <div><button class="dropdown-content" onclick="showInfo('info3')">Upper East</button></div>
+             <div><button class="dropdown-content"onclick="showInfo('info3')">Upper West</button></div>
+             <div><button class="dropdown-content" onclick="showInfo('info3')">Volta</button></div>
+             <div><button class="dropdown-content" onclick="showInfo('info3')">Western</button></div>
+             <div><button class="dropdown-content" onclick="showInfo('info3')">Western North</button></div>
+             <div><button class="dropdown-content" onclick="showInfo('info3')">Western North</button></div>
+             <div><button class="dropdown-content" onclick="showInfo('info3')">Western North</button></div>
+             
+             
+             
+        </div>
+    </div>
+
+    <div id="info1" class="info-box">
+        This is information about Option 1. It provides details when selected.
+    </div>
+    <div id="info2" class="info-box">
+        This is information about Option 2. It appears when Option 2 is clicked.
+    </div>
+    <div id="info3" class="info-box">
+        This is information about Option 3. Select it to see this message.
+    </div>
+
+    <script>
+        function toggleDropdown() {
+            document.querySelector('.dropdown').classList.toggle('open');
+        }
+
+        function showInfo(infoId) {
+            
+            document.querySelectorAll('.info-box').forEach(box => {
+                box.style.display = 'none';
+            });
+         
+            document.getElementById(infoId).style.display = 'block';
+            
+            document.querySelector('.dropdown').classList.remove('open');
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown-button')) {
+                var dropdowns = document.querySelectorAll('.dropdown');
+                dropdowns.forEach(dropdown => {
+                    dropdown.classList.remove('open');
+                });
+            }
+        }
+    </script>
     </div>
 
     <script>

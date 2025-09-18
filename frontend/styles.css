@@ -97,7 +97,9 @@
             background-color: #c0392b;
         }
         
-        
+        .location{
+            color: #f8f9fa;
+        }
         .features {
             padding: 4rem 0;
             background-color: white;
@@ -120,7 +122,7 @@
 
 
         }
-       
+        
         .feature-card {
             background-color: #f8f9fa;
             border-radius: 8px;
@@ -161,7 +163,9 @@
             background-color: #c0392b;
         }
         
-        
+        .dropdown-content{
+            border: none;
+        }
       
         .how-it-works {
             padding: 4rem 0;
@@ -272,6 +276,7 @@
                 font-size: large;
 
            }
+          
         }
 
 
