@@ -1,83 +1,617 @@
-<!DOCTYPE html>
+<!DOCTYPE ahtml>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Location</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>FixFinder Locations</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        * {
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #f0f0f0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        #map {
+
+        body {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .container {
             width: 100%;
-            height: 80vh;
-            max-width: 800px;
-            margin: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
-        #location-info {
-            margin: 10px;
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+
+        .logo span {
+            color: #e74c3c;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #3498db;
+        }
+
+        .hero {
+            padding: 4rem 0;
+            text-align: center;
+            background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.8)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%233498db" opacity="0.2"/><path d="M0 0L100 100" stroke="%23e74c3c" stroke-width="2" opacity="0.2"/><path d="M100 0L0 100" stroke="%23e74c3c" stroke-width="2" opacity="0.2"/></svg>');
+            background-size: cover;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 20px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 15px 20px;
             font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
         }
-        #error {
-            color: red;
-            margin: 10px;
+
+        #searchInput:focus {
+            border-color: #4CAF50;
+        }
+
+        #suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 25px 25px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
             display: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .suggestion-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s ease;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f0f8ff;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .no-results {
+            padding: 12px 20px;
+            color: #999;
+            font-style: italic;
+        }
+
+        .dropdown {
+            position: relative;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .where {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .dropdown-button {
+            background-color: #e74c3c;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .dropdown-button:hover {
+            background-color: #c0392b;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: white;
+            min-width: 320px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            z-index: 1001;
+            border-radius: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .dropdown.open .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content button {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-content button:hover {
+            background-color: #f0f8ff;
+        }
+
+        .info-box {
+            display: none;
+            margin: 20px auto;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border-radius: 8px;
+            max-width: 500px;
+            text-align: center;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .features {
+            padding: 4rem 0;
+            background-color: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #2c3e50;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #3498db;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .how-it-works {
+            padding: 4rem 0;
+            background-color: #f8f9fa;
+        }
+
+        .steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 250px;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 50%;
+            line-height: 40px;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer-section h3 {
+            color: #3498db;
+        }
+
+        .footer-section p {
+            color: white;
+        }
+
+        .footer-section a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .footer-section a:hover {
+            color: #e74c3c;
+        }
+
+        .footer-bottom {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+                justify-content: center;
+            }
+
+            nav ul li {
+                margin: 0 0.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .dropdown-content {
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav ul li {
+                margin: 0.5rem 0;
+            }
+
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .feature-card {
+                padding: 1.5rem;
+                border: none;
+            }
+
+            .dropdown-content {
+                min-width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="location-info" class="locator">locating you</div>
-    <div id="error"></div>
-    <div id="map"></div>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">FIXFINDER<span>.com</span></div>
+                <nav>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="locations.html">Locations</a></li>
+                        <li><a href="tel:0595785158">Become a Mechanic</a></li>
+                        <li><a href="tel:0595785158">Support</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <section class="hero">
+        <div class="container">
+            <h1>Find Trusted Mechanics Across Ghana</h1>
+            <p>Search for reliable vehicle repair services in your region or city.</p>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search for a location in Ghana...">
+                <div id="suggestions"></div>
+            </div>
+            <div class="dropdown">
+                <div class="where">Where in Ghana are you?</div>
+                <button class="dropdown-button" onclick="toggleDropdown()">Select Region</button>
+                <div class="dropdown-content">
+                    <button onclick="showInfo('info1')">Greater Accra</button>
+                    <button onclick="showInfo('info2')">Bono</button>
+                    <button onclick="showInfo('info3')">Ahafo</button>
+                    <button onclick="showInfo('info4')">Bono East</button>
+                    <button onclick="showInfo('info5')">Central</button>
+                    <button onclick="showInfo('info6')">Northern</button>
+                    <button onclick="showInfo('info7')">North East</button>
+                    <button onclick="showInfo('info8')">Oti</button>
+                    <button onclick="showInfo('info9')">Savannah</button>
+                    <button onclick="showInfo('info10')">Upper East</button>
+                    <button onclick="showInfo('info11')">Upper West</button>
+                    <button onclick="showInfo('info12')">Volta</button>
+                    <button onclick="showInfo('info13')">Western</button>
+                    <button onclick="showInfo('info14')">Western North</button>
+                </div>
+            </div>
+            <div id="info1" class="info-box">Find trusted mechanics in Greater Accra, including Accra, Tema, and Madina.</div>
+            <div id="info2" class="info-box">Explore vehicle repair services in Bono, covering Sunyani and Berekum.</div>
+            <div id="info3" class="info-box">Discover mechanics in Ahafo, such as in Goaso and Hwidiem.</div>
+            <div id="info4" class="info-box">Locate repair shops in Bono East, including Techiman and Atebubu.</div>
+            <div id="info5" class="info-box">Central Region mechanics available in Cape Coast, Winneba, and more.</div>
+            <div id="info6" class="info-box">Northern Region services in Tamale, Yendi, and surrounding areas.</div>
+            <div id="info7" class="info-box">Find mechanics in North East, including Nalerigu and Walewale.</div>
+            <div id="info8" class="info-box">Oti Region repair shops in Dambai, Nkwanta, and Jasikan.</div>
+            <div id="info9" class="info-box">Savannah Region mechanics in Damongo and nearby towns.</div>
+            <div id="info10" class="info-box">Upper East repair services in Bolgatanga, Bawku, and Navrongo.</div>
+            <div id="info11" class="info-box">Upper West mechanics available in Wa, Tumu, and Jirapa.</div>
+            <div id="info12" class="info-box">Volta Region services in Ho, Keta, and Aflao.</div>
+            <div id="info13" class="info-box">Western Region mechanics in Takoradi, Sekondi, and Tarkwa.</div>
+            <div id="info14" class="info-box">Western North repair shops in Bibiani and Sefwi Wiawso.</div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Why Choose FixFinder?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <h3>Trusted Mechanics</h3>
+                    <p>Connect with verified professionals for reliable vehicle repairs.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📍</div>
+                    <h3>Nationwide Coverage</h3>
+                    <p>Find mechanics in every region and major city across Ghana.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚗</div>
+                    <h3>Quick Service</h3>
+                    <p>Get your vehicle back on the road with fast, efficient repairs.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Search Location</h3>
+                    <p>Enter your city or select a region to find mechanics near you.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Choose a Mechanic</h3>
+                    <p>Browse verified professionals and select the best fit.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Get Your Vehicle Fixed</h3>
+                    <p>Book a service and get your vehicle repaired quickly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>FIXFINDER</h3>
+                    <p>Connecting vehicle owners with trusted mechanics since 2025.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <p><a href="locations.html">Find a Mechanic</a></p>
+                    <p><a href="tel:0595785158">Become a Mechanic</a></p>
+                    <p><a href="tel:0595785158">Support</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact FixFinder</h3>
+                    <p><a href="mailto:help@fixfinder.com">help@fixfinder.com</a></p>
+                    <p><a href="tel:0595785158">0595785158</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 FIXFINDER. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
     <script>
-        function showLocation() {
-            const locationInfo = document.getElementById('location-info');
-            const errorDiv = document.getElementById('error');
+        const locations = [
+            "Accra", "Tema", "Madina", "Adenta", "Teshie", "Nungua", "Ashaiman", "Kasoa", "Amasaman", "Dodowa",
+            "Kumasi", "Obuasi", "Mampong", "Ejisu", "Agogo", "Konongo", "Bekwai", "Mankranso", "Fomena", "Effiduase",
+            "Koforidua", "Nkawkaw", "Somanya", "Nsawam", "Aburi", "Akosombo", "Atimpoku", "Begoro", "Ofoase", "Kade",
+            "Cape Coast", "Elmina", "Winneba", "Swedru", "Dunkwa", "Mankessim", "Saltpond", "Mumford", "Apam",
+            "Takoradi", "Sekondi", "Axim", "Prestea", "Tarkwa", "Elubo", "Half Assini", "Samreboi", "Bibiani", "Enchi",
+            "Ho", "Kpando", "Hohoe", "Keta", "Aflao", "Ada", "Anloga", "Akatsi", "Denu", "Sogakope",
+            "Tamale", "Yendi", "Salaga", "Bimbila", "Gushiegu", "Karaga", "Nalerigu", "Walewale",
+            "Bolgatanga", "Navrongo", "Bawku", "Paga", "Zebilla", "Garu", "Chiana", "Tongo", "Bongo", "Sirigu",
+            "Wa", "Tumu", "Lawra", "Nandom", "Jirapa", "Hamile", "Wala", "Wechiau", "Bole", "Buipe",
+            "Sunyani", "Techiman", "Kintampo", "Berekum", "Wenchi", "Atebubu", "Sampa", "Nkrankwasi", "Banda Ahenkro", "Jema",
+            "Banda Ahenkro", "Brekum", "New Drobo", "Nsawkaw", "Odumase", "Sewhi Anane", "Tanoso",
+            "Atebubu", "Kintampo", "Jema", "Prang", "Tuobodom", "Yeji", "Kwame Danso", "Busunya", "Nkoranza",
+            "Goaso", "Hwidiem", "Kukuom", "Bechem", "Atronie", "Hwehwe", "Subinso", "Daboya",
+            "Dambai", "Nkwanta", "Kadjebi", "Kpassa", "Jasikan", "Kete Krachie"
+        ];
 
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        locationInfo.textContent = `Your location: Latitude ${lat.toFixed(4)}, Longitude ${lon.toFixed(4)}`;
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsDiv = document.getElementById('suggestions');
 
-                        // Initialize the map
-                        const map = L.map('map').setView([lat, lon], 13);
-
-                        // Add OpenStreetMap tiles
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        }).addTo(map);
-
-                        // Add a marker at the user's location
-                        L.marker([lat, lon]).addTo(map)
-                            .bindPopup('You are here!')
-                            .openPopup();
-                    },
-                    (error) => {
-                        locationInfo.textContent = '';
-                        errorDiv.style.display = 'block';
-                        errorDiv.textContent = 'Unable to retrieve location. Please ensure location services are enabled.';
-                    }
-                );
-            } else {
-                locationInfo.textContent = '';
-                errorDiv.style.display = 'block';
-                errorDiv.textContent = 'Geolocation is not supported by this browser.';
-            }
+        function filterLocations(query) {
+            return locations.filter(location => 
+                location.toLowerCase().includes(query.toLowerCase())
+            ).slice(0, 10);
         }
 
-        // Call the function when the page loads
-        window.onload = showLocation;
+        function displaySuggestions(suggestions) {
+            suggestionsDiv.innerHTML = '';
+            if (suggestions.length === 0) {
+                suggestionsDiv.innerHTML = '<div class="no-results">No locations found</div>';
+            } else {
+                suggestions.forEach(suggestion => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    item.textContent = suggestion;
+                    item.onclick = () => {
+                        window.location.href = `location.html?place=${encodeURIComponent(suggestion)}`;
+                    };
+                    suggestionsDiv.appendChild(item);
+                });
+            }
+            suggestionsDiv.style.display = suggestions.length > 0 || searchInput.value.length > 0 ? 'block' : 'none';
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (query.length > 0) {
+                const filtered = filterLocations(query);
+                displaySuggestions(filtered);
+            } else {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const firstSuggestion = suggestionsDiv.querySelector('.suggestion-item');
+                if (firstSuggestion) {
+                    firstSuggestion.click();
+                }
+            }
+        });
+
+        function toggleDropdown() {
+            document.querySelector('.dropdown').classList.toggle('open');
+        }
+
+        function showInfo(infoId) {
+            document.querySelectorAll('.info-box').forEach(box => {
+                box.style.display = 'none';
+            });
+            document.getElementById(infoId).style.display = 'block';
+            document.querySelector('.dropdown').classList.remove('open');
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown-button') && !event.target.closest('.dropdown-content')) {
+                document.querySelectorAll('.dropdown').forEach(dropdown => {
+                    dropdown.classList.remove('open');
+                });
+            }
+        }
     </script>
 </body>
-
 </html>
